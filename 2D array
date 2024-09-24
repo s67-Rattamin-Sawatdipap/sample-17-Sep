@@ -1,3 +1,4 @@
+void setup() {
 size(500, 500);
 strokeWeight(12);
 background(255);
