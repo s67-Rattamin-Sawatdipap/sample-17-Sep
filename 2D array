@@ -1,22 +1,37 @@
-int cardWidth = 100; // ความกว้างของการ์ด
-int cardHeight = 100; // ความสูงของการ์ด
+int firstCardX = -1, firstCardY = -1; // ตำแหน่งการ์ดที่เปิดครั้งแรก
+int revealedCount = 0; // จำนวนการ์ดที่เปิด
+boolean lockBoard = false; // ใช้ล็อคบอร์ดเมื่อเปิดการ์ด
 
-void drawCards() {
-  for (int x = 0; x < 4; x++) {
-    for (int y = 0; y < 4; y++) {
-      if (revealed[x][y]) {
-        fill(100, 200, 100);
-        rect(x * cardWidth, y * cardHeight, cardWidth, cardHeight);
-        fill(0);
-        textAlign(CENTER, CENTER);
-        text(cards[x][y], x * cardWidth + cardWidth / 2, y * cardHeight + cardHeight / 2);
+void mousePressed() {
+  if (lockBoard) return;
+
+  int x = mouseX / cardWidth;
+  int y = mouseY / cardHeight;
+
+  if (x < 0 || x >= 4 || y < 0 || y >= 4) return; // ตรวจสอบว่าคลิกภายในขอบเขต
+
+  if (!revealed[x][y]) {
+    revealed[x][y] = true;
+    if (firstCardX == -1) {
+      firstCardX = x;
+      firstCardY = y;
+    } else {
+      if (cards[firstCardX][firstCardY] == cards[x][y]) {
+        revealedCount += 2;
+        firstCardX = -1; // รีเซ็ตการ์ดแรก
       } else {
-        fill(100, 150, 200);
-        rect(x * cardWidth, y * cardHeight, cardWidth, cardHeight);
+        lockBoard = true;
+        delay(1000); // รอ 1 วินาทีก่อนปิดการ์ด
+        revealed[firstCardX][firstCardY] = false; // ปิดการ์ดแรก
+        revealed[x][y] = false; // ปิดการ์ดที่สอง
+        firstCardX = -1; // รีเซ็ตการ์ดแรก
+        lockBoard = false;
       }
-      stroke(0);
-      noFill();
-      rect(x * cardWidth, y * cardHeight, cardWidth, cardHeight);
     }
+  }
+
+  if (revealedCount == numPairs * 2) {
+    println("คุณชนะ!");
+    noLoop(); // หยุดการวาด
   }
 }
