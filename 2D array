@@ -1,6 +1,21 @@
+int numPairs = 8; // จำนวนคู่
+int cardWidth = 100; // ความกว้างของการ์ด
+int cardHeight = 100; // ความสูงของการ์ด
+int[][] cards; // เก็บค่าของการ์ด
+boolean[][] revealed; // เก็บสถานะการ์ดที่เปิด
 int firstCardX = -1, firstCardY = -1; // ตำแหน่งการ์ดที่เปิดครั้งแรก
 int revealedCount = 0; // จำนวนการ์ดที่เปิด
 boolean lockBoard = false; // ใช้ล็อคบอร์ดเมื่อเปิดการ์ด
+
+void setup() {
+  size(400, 400);
+  initializeCards();
+}
+
+void draw() {
+  background(255);
+  drawCards();
+}
 
 void mousePressed() {
   if (lockBoard) return;
@@ -33,5 +48,51 @@ void mousePressed() {
   if (revealedCount == numPairs * 2) {
     println("คุณชนะ!");
     noLoop(); // หยุดการวาด
+  }
+}
+
+void initializeCards() {
+  cards = new int[4][4];
+  revealed = new boolean[4][4];
+  int[] values = new int[numPairs * 2];
+  for (int i = 0; i < numPairs; i++) {
+    values[i * 2] = i;
+    values[i * 2 + 1] = i;
+  }
+  
+  // สุ่มการ์ด
+  for (int i = 0; i < values.length; i++) {
+    int r = int(random(i + 1));
+    int temp = values[i];
+    values[i] = values[r];
+    values[r] = temp;
+  }
+
+  // จัดเก็บการ์ดในบอร์ด
+  for (int x = 0; x < 4; x++) {
+    for (int y = 0; y < 4; y++) {
+      cards[x][y] = values[x * 4 + y];
+      revealed[x][y] = false;
+    }
+  }
+}
+
+void drawCards() {
+  for (int x = 0; x < 4; x++) {
+    for (int y = 0; y < 4; y++) {
+      if (revealed[x][y]) {
+        fill(100, 200, 100);
+        rect(x * cardWidth, y * cardHeight, cardWidth, cardHeight);
+        fill(0);
+        textAlign(CENTER, CENTER);
+        text(cards[x][y], x * cardWidth + cardWidth / 2, y * cardHeight + cardHeight / 2);
+      } else {
+        fill(100, 150, 200);
+        rect(x * cardWidth, y * cardHeight, cardWidth, cardHeight);
+      }
+      stroke(0);
+      noFill();
+      rect(x * cardWidth, y * cardHeight, cardWidth, cardHeight);
+    }
   }
 }
